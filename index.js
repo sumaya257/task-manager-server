@@ -36,9 +36,22 @@ async function run() {
   try {
     // Access the collections
     const userCollection = client.db('TaskManager').collection('users');
+    const taskCollection = client.db('TaskManager').collection('tasks');
+
+    // Add a new task
+    app.post("/added-task", async (req, res) => {
+    const task = req.body;
+    try {
+        const result = await taskCollection.insertOne(task);
+        res.status(201).send(result);
+      } catch (error) {
+        console.error('Error adding task:', error);
+        res.status(500).send({ error: 'An error occurred while adding the task.' });
+      }
+    });
+  
+
     
-
-
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
