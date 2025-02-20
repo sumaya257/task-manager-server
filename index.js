@@ -13,12 +13,7 @@
     // cookie parser middleware
 	app.use(cookieParser());
 	app.use(express.json());
-	app.use(cors(
-	    {
-	        origin: ['<http://localhost:5174>'], //replace with client address
-	        credentials: true,
-	    }
-	)); 
+	app.use(cors());
 
     
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ju1bs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -49,6 +44,12 @@ async function run() {
         res.status(500).send({ error: 'An error occurred while adding the task.' });
       }
     });
+
+    // Get All Tasks API
+    app.get("/added-task", async (req, res) => {
+    const tasks = await taskCollection.find().toArray();
+    res.send(tasks);
+  });
   
 
     
