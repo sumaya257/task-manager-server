@@ -53,6 +53,32 @@ async function run() {
     res.send(tasks);
   });
 
+  //update-task
+
+  app.put('/added-task/:id', async (req, res) => {
+    const { id } = req.params;
+    const updatedTask = req.body;
+
+    // Remove `_id` from the update payload it cant be changed
+    delete updatedTask._id;
+
+    try {
+      const result = await taskCollection.updateOne(
+        { _id: new ObjectId(id) }, // Filter by ID
+        { $set: updatedTask }     // Update fields
+      );
+
+      if (result.matchedCount > 0) {
+        res.status(200).send({ message: 'Task updated successfully!' });
+      } else {
+        res.status(404).send({ error: 'Task not found!' });
+      }
+    } catch (error) {
+      console.error('Error updating:', error);
+      res.status(500).send({ error: 'An error occurred while updating.' });
+    }
+  });
+
   //delete tasks api
     app.delete('/added-task/:id', async (req, res) => {
       const { id } = req.params;
@@ -60,13 +86,13 @@ async function run() {
         const result = await taskCollection.deleteOne({ _id: new ObjectId(id) });
 
         if (result.deletedCount > 0) {
-          res.status(200).send({ message: 'Movie deleted successfully!' });
+          res.status(200).send({ message: 'Task deleted successfully!' });
         } else {
-          res.status(404).send({ error: 'Movie not found!' });
+          res.status(404).send({ error: 'Task not found!' });
         }
       } catch (error) {
-        console.error('Error deleting movie:', error);
-        res.status(500).send({ error: 'An error occurred while deleting the movie.' });
+        console.error('Error deleting:', error);
+        res.status(500).send({ error: 'An error occurred while deleting.' });
       }
     });
 
