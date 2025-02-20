@@ -3,9 +3,11 @@
 	const jwt = require('jsonwebtoken');
 	const cookieParser = require('cookie-parser');
 	require('dotenv').config();
-    const { MongoClient, ServerApiVersion } = require('mongodb');
+    const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+    const morgan = require('morgan');
 
 	const app = express();
+    app.use(morgan('dev'));
 	
 	const port = process.env.PORT || 5000;
 	
@@ -50,6 +52,26 @@ async function run() {
     const tasks = await taskCollection.find().toArray();
     res.send(tasks);
   });
+
+  //delete tasks api
+    app.delete('/added-task/:id', async (req, res) => {
+      const { id } = req.params;
+      try {
+        const result = await taskCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount > 0) {
+          res.status(200).send({ message: 'Movie deleted successfully!' });
+        } else {
+          res.status(404).send({ error: 'Movie not found!' });
+        }
+      } catch (error) {
+        console.error('Error deleting movie:', error);
+        res.status(500).send({ error: 'An error occurred while deleting the movie.' });
+      }
+    });
+
+    
+  
   
 
     
