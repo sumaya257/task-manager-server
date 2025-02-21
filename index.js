@@ -35,6 +35,36 @@ async function run() {
     const userCollection = client.db('TaskManager').collection('users');
     const taskCollection = client.db('TaskManager').collection('tasks');
 
+    // Add a new user
+    app.post("/added-user", async (req, res) => {
+        const user = req.body;
+        try {
+            const result = await userCollection.insertOne(user);
+            res.status(201).send(result);
+          } catch (error) {
+            console.error('Error adding user:', error);
+            res.status(500).send({ error: 'An error occurred while adding the user.' });
+          }
+        });
+
+        // DELETE route to remove a user from the database
+app.delete("/delete-user", async (req, res) => {
+    const { uid } = req.body;  // Get UID from the request body
+    try {
+        // Delete the user from the collection based on their UID
+        const result = await userCollection.deleteMany({ uid: uid });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        res.status(200).send({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).send({ error: 'An error occurred while deleting the user.' });
+    }
+});
+
     // Add a new task
     app.post("/added-task", async (req, res) => {
     const task = req.body;
